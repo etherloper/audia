@@ -1,0 +1,22 @@
+node_modules/
+dist/
+src-tauri/target/
+
+# Environment (secrets / local overrides)
+.env
+.env.local
+.env.*.local
+
+# Tooling / caches
+*.tsbuildinfo
+.turbo/
+
+# Logs and OS noise
+*.log
+.DS_Store
+Thumbs.db
+
+# Editors and local AI tooling settings
+.idea/
+.cursor/
+.claude/

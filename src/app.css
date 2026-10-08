@@ -1,0 +1,388 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Neutral scale for dark mode */
+  --color-surface-50: #fafafa;
+  --color-surface-100: #f5f5f5;
+  --color-surface-200: #e5e5e5;
+  --color-surface-300: #d4d4d4;
+  --color-surface-400: #a3a3a3;
+  --color-surface-500: #737373;
+  --color-surface-600: #525252;
+  --color-surface-700: #333333;
+  --color-surface-800: #1a1a1a;
+  --color-surface-850: #111111;
+  --color-surface-900: #0a0a0a;
+  --color-surface-950: #000000;
+
+  /* Page background behind the main content. Dark mode uses the same black as
+     the sidebar and player bar (.chrome) so they match exactly, which shows on
+     OLED screens. Overridden for dark mode under html.dark below. */
+  --color-canvas: #ffffff;
+
+  /* Light mode palette: neutral greys from near-white to near-black. (Named
+     "warm" because it started out as warm browns; components use these names
+     for every light-mode colour, so the scheme is set here.) */
+  --color-warm-50: #fafafa;
+  --color-warm-100: #f4f4f4;
+  --color-warm-200: #e5e5e5;
+  --color-warm-300: #d4d4d4;
+  --color-warm-400: #a3a3a3;
+  --color-warm-500: #737373;
+  --color-warm-600: #525252;
+  --color-warm-700: #404040;
+  --color-warm-800: #262626;
+  --color-warm-900: #171717;
+
+  /* Accent — used for playback affordances. These are the light-theme
+     defaults (black, mirroring white in dark mode); html.dark below swaps them,
+     and user presets override both via inline styles (see state/ui.svelte.ts). */
+  --color-accent-300: #d4d4d4;
+  --color-accent-400: #404040;
+  --color-accent-500: #171717;
+  --color-accent-600: #0a0a0a;
+  --color-accent-fg: #ffffff;
+}
+
+/* Default accent in dark mode: white (monochrome look) */
+html.dark {
+  --color-canvas: #070707;
+  --color-accent-300: #d4d4d4;
+  --color-accent-400: #e5e5e5;
+  --color-accent-500: #ffffff;
+  --color-accent-600: #d4d4d4;
+  --color-accent-fg: #000000;
+}
+
+html {
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Light mode: white */
+html:not(.dark) body {
+  background-color: var(--color-canvas);
+  color: var(--color-warm-900);
+}
+
+/* Dark mode: near-black */
+html.dark body {
+  background-color: var(--color-canvas);
+  color: #f5f5f5;
+}
+
+/* ============================================
+   BUTTONS
+   Translucent at rest; on hover they take on the accent colour chosen in
+   Settings (the --color-accent-* variables). In the components layer so a
+   component's own utilities (sizes, scale effects, disabled styles) still win.
+   ============================================ */
+@layer components {
+  /* Main actions: Save, Import, play/pause… */
+  .btn-primary {
+    background-color: color-mix(in srgb, var(--color-warm-800) 9%, transparent);
+    color: var(--color-warm-900);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-warm-800) 12%, transparent);
+    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s;
+  }
+  html.dark .btn-primary {
+    background-color: rgb(255 255 255 / 0.09);
+    color: #fff;
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--color-accent-500);
+    color: var(--color-accent-fg);
+    box-shadow: inset 0 0 0 1px transparent;
+  }
+
+  /* Secondary actions: Cancel, Browse… (pair with Tailwind's `border` for the width) */
+  .btn-secondary {
+    background-color: transparent;
+    border-color: color-mix(in srgb, var(--color-warm-800) 14%, transparent);
+    transition: background-color 0.2s, border-color 0.2s;
+  }
+  html.dark .btn-secondary {
+    border-color: rgb(255 255 255 / 0.12);
+  }
+  .btn-secondary:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--color-accent-500) 14%, transparent);
+    border-color: color-mix(in srgb, var(--color-accent-500) 50%, transparent);
+  }
+
+  /* Buttons drawn over cover art */
+  /* A border rather than an inset shadow, so it survives Tailwind shadow utilities */
+  .btn-overlay {
+    background-color: rgb(0 0 0 / 0.35);
+    color: #fff;
+    border: 1px solid rgb(255 255 255 / 0.15);
+    backdrop-filter: blur(6px);
+  }
+  .btn-overlay:hover {
+    background-color: var(--color-accent-500);
+    color: var(--color-accent-fg);
+    border-color: transparent;
+  }
+}
+
+/* ============================================
+   MICRO-ANIMATIONS
+   ============================================ */
+
+/* Gentle fade-in for views / modals */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Subtle scale-in for popups and menus */
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Smooth pulse glow for active states */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  50% { box-shadow: 0 0 12px 2px rgba(255, 255, 255, 0.06); }
+}
+
+/* Page change: opacity only, since a transform would change how fixed-position
+   pop-ups inside the page are placed */
+@keyframes viewIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.view-enter {
+  animation: viewIn 0.15s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-enter {
+    animation: none;
+  }
+}
+
+/* A notification's action countdown: a bar that drains over the toast's lifetime */
+@keyframes toastCountdown {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
+}
+
+.toast-countdown {
+  animation-name: toastCountdown;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+}
+
+/* Utility classes for animations */
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out both;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Chrome — solid app furniture (sidebar, player bar). Solid on purpose:
+   nothing scrolls behind these surfaces, and backdrop blur left a visible
+   halo along their edges. */
+.chrome {
+  background: var(--chrome-bg);
+  border-color: var(--chrome-border);
+}
+
+html.dark .chrome {
+  --chrome-bg: var(--color-canvas);
+  --chrome-border: rgba(255, 255, 255, 0.07);
+}
+
+html:not(.dark) .chrome {
+  --chrome-bg: #f7f7f7;
+  --chrome-border: rgba(0, 0, 0, 0.07);
+}
+
+/* Menu surface — solid background for dropdown and context menus */
+.menu-surface {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+html.dark .menu-surface {
+  background: #181818;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Tooltip surface — the hover tooltips and value bubbles (seek time, volume…).
+   A light card in light mode and a dark one in dark mode, to sit with each theme. */
+.tooltip-surface {
+  background: #ffffff;
+  color: var(--color-warm-800);
+  border: 1px solid var(--color-warm-200);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 0.1), 0 1px 3px rgb(0 0 0 / 0.06);
+}
+
+html.dark .tooltip-surface {
+  background: #1d1d1d;
+  color: #ededed;
+  border-color: rgb(255 255 255 / 0.1);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.6);
+}
+
+/* ============================================
+   SCROLLBAR
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: var(--color-warm-300);
+  border-radius: 3px;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-warm-400);
+}
+
+/* ============================================
+   RANGE INPUTS
+   ============================================ */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"]:hover {
+  height: 5px;
+}
+
+html.dark input[type="range"] {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+html:not(.dark) input[type="range"] {
+  background: var(--color-warm-300);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+html.dark input[type="range"]::-webkit-slider-thumb {
+  background: #fff;
+}
+
+html:not(.dark) input[type="range"]::-webkit-slider-thumb {
+  background: var(--color-warm-700);
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+/* ============================================
+   WAVEFORM ANIMATION
+   ============================================ */
+
+@keyframes waveform-edge {
+  0%, 100% { transform: scaleY(0.3); }
+  50%     { transform: scaleY(0.65); }
+}
+@keyframes waveform-mid {
+  0%, 100% { transform: scaleY(0.45); }
+  50%     { transform: scaleY(0.9); }
+}
+@keyframes waveform-center {
+  0%, 100% { transform: scaleY(0.55); }
+  50%     { transform: scaleY(1); }
+}
+
+.waveform-bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+}
+
+.waveform-bars > span {
+  display: block;
+  width: 2.5px;
+  height: 100%;
+  border-radius: 9999px;
+  transform-origin: center;
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.waveform-bars > span:nth-child(1) { animation-name: waveform-edge;   animation-duration: 1.05s; animation-delay: -0.05s; }
+.waveform-bars > span:nth-child(2) { animation-name: waveform-mid;    animation-duration: 0.85s; animation-delay: -0.35s; }
+.waveform-bars > span:nth-child(3) { animation-name: waveform-center; animation-duration: 0.95s; animation-delay: -0.20s; }
+.waveform-bars > span:nth-child(4) { animation-name: waveform-mid;    animation-duration: 0.90s; animation-delay: -0.45s; }
+.waveform-bars > span:nth-child(5) { animation-name: waveform-edge;   animation-duration: 1.10s; animation-delay: -0.15s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .waveform-bars > span {
+    animation: none;
+    transform: scaleY(0.7);
+  }
+}
+
+/* ============================================
+   MISC
+   ============================================ */
+
+html:not(.dark) select {
+  color: var(--color-warm-900);
+}
+
+/* Smooth transitions on interactive elements */
+button, a, input, select {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Pointer cursor on anything clickable */
+button, a, select, summary, [role="button"],
+input[type="checkbox"], input[type="radio"] {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
