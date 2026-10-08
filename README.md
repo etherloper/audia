@@ -4,6 +4,12 @@ An offline audiobook player for your own library. Point it at the folder where y
 
 <!-- Add a screenshot here, e.g. ![Audia library](docs/screenshot-library.png) -->
 
+## Download
+
+Get the latest Windows installer (`Audia_…_x64-setup.exe`) from the [Releases page](https://github.com/etherloper/audia/releases/latest). Once installed, Audia checks for new versions itself and offers to update; you can turn that off or check by hand in **Settings → About**.
+
+The installer isn't code-signed yet, so Windows SmartScreen may warn you the first time. Choose **More info → Run anyway**.
+
 ## Features
 
 **Library**
@@ -61,7 +67,7 @@ Audia is built with [Tauri 2](https://tauri.app), [Svelte 5](https://svelte.dev)
 ### Prerequisites
 
 - [Bun](https://bun.sh)
-- [Rust](https://rustup.rs) 1.85 or newer
+- [Rust](https://rustup.rs) 1.90 or newer
 - The Tauri prerequisites for your platform: see [Tauri's guide](https://tauri.app/start/prerequisites/). On Windows that's the Microsoft C++ Build Tools and WebView2, which Windows 10 and 11 already include.
 
 ### Commands
@@ -82,6 +88,16 @@ cargo test           # Rust tests
 cargo clippy         # Rust lints
 cargo fmt --check    # Rust formatting
 ```
+
+## Releasing
+
+Releases are built by GitHub Actions (`.github/workflows/release.yml`) when a version tag is pushed:
+
+1. Bump the version in `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml` and `package.json`, and commit.
+2. Tag and push: `git tag v0.2.0` then `git push origin v0.2.0`. The tag must match the version.
+3. The workflow runs the checks, builds the installer and the signed update files, and creates a **draft** release. Review it on GitHub and publish it; installed copies only see published releases.
+
+Updates are signed. The workflow needs two repository secrets, `TAURI_SIGNING_PRIVATE_KEY` and `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`, from a key made with `bun tauri signer generate`. The matching public key is in `tauri.conf.json`. Keep the private key out of the repository and backed up: without it, existing installs can't be sent updates.
 
 ## Where your data lives
 

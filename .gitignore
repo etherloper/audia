@@ -7,6 +7,10 @@ src-tauri/target/
 .env.local
 .env.*.local
 
+# Update signing keys belong outside the repo (see README); never commit them
+*.key
+*.key.pub
+
 # Tooling / caches
 *.tsbuildinfo
 .turbo/
