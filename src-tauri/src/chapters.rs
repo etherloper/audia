@@ -170,8 +170,10 @@ fn mp4_chapter_track<R: Read + Seek>(reader: &mut R, file_size: u64) -> Option<V
         if let Some(chap) = find_path(reader, *trak, &[b"tref", b"chap"]) {
             let data = read_range(reader, chap, 4096)?;
             chapter_ids.extend(
-                data.chunks_exact(4)
-                    .map(|c| u32::from_be_bytes(c.try_into().unwrap())),
+                data.as_chunks::<4>()
+                    .0
+                    .iter()
+                    .map(|c| u32::from_be_bytes(*c)),
             );
         }
     }
@@ -290,14 +292,18 @@ fn mp4_chapter_track<R: Read + Seek>(reader: &mut R, file_size: u64) -> Option<V
 fn decode_text_sample(bytes: &[u8]) -> String {
     if bytes.starts_with(&[0xFE, 0xFF]) {
         let units: Vec<u16> = bytes[2..]
-            .chunks_exact(2)
-            .map(|c| u16::from_be_bytes([c[0], c[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|c| u16::from_be_bytes(*c))
             .collect();
         String::from_utf16_lossy(&units)
     } else if bytes.starts_with(&[0xFF, 0xFE]) {
         let units: Vec<u16> = bytes[2..]
-            .chunks_exact(2)
-            .map(|c| u16::from_le_bytes([c[0], c[1]]))
+            .as_chunks::<2>()
+            .0
+            .iter()
+            .map(|c| u16::from_le_bytes(*c))
             .collect();
         String::from_utf16_lossy(&units)
     } else {
@@ -378,10 +384,10 @@ fn parse_id3_frames(data: &[u8], version: u8) -> Option<Vec<(f64, String)>> {
             be_u32(data, pos + 4)?
         } as usize;
         let body = data.get(pos + 10..pos + 10 + size)?;
-        if id == b"CHAP" {
-            if let Some(ch) = parse_chap(body, version) {
-                chapters.push(ch);
-            }
+        if id == b"CHAP"
+            && let Some(ch) = parse_chap(body, version)
+        {
+            chapters.push(ch);
         }
         pos += 10 + size;
     }
@@ -428,7 +434,9 @@ fn decode_id3_text(frame: &[u8]) -> String {
                 _ => (encoding == 2, text),
             };
             let units: Vec<u16> = body
-                .chunks_exact(2)
+                .as_chunks::<2>()
+                .0
+                .iter()
                 .map(|c| {
                     if big_endian {
                         u16::from_be_bytes([c[0], c[1]])

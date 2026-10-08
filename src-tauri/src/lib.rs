@@ -73,6 +73,10 @@ pub fn run() {
         .manage(watcher::LibraryWatcher::default())
         .manage(media_controls::MediaControlsState::default())
         .plugin(tauri_plugin_dialog::init())
+        // Updates come from GitHub Releases (see plugins.updater in tauri.conf.json);
+        // process is for restarting into the new version afterwards
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .setup(|app| {
             tray::setup(app.handle())?;
             media_controls::setup(app.handle());
@@ -81,12 +85,11 @@ pub fn run() {
             let handle = app.handle().clone();
             std::thread::spawn(move || {
                 std::thread::sleep(std::time::Duration::from_secs(4));
-                if let Some(window) = handle.get_webview_window("main") {
-                    if !window.is_visible().unwrap_or(true)
-                        && !window.is_minimized().unwrap_or(false)
-                    {
-                        let _ = window.show();
-                    }
+                if let Some(window) = handle.get_webview_window("main")
+                    && !window.is_visible().unwrap_or(true)
+                    && !window.is_minimized().unwrap_or(false)
+                {
+                    let _ = window.show();
                 }
             });
             log::info!("Audia {} starting", app.package_info().version);

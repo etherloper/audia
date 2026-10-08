@@ -94,10 +94,10 @@ fn load_cache(path: &Path) -> ScanCache {
 fn save_cache(path: &Path, cache: &ScanCache) {
     // Write then rename so a crash mid-write can't leave a corrupt cache
     let tmp = path.with_extension("json.tmp");
-    if let Ok(bytes) = serde_json::to_vec(cache) {
-        if std::fs::write(&tmp, bytes).is_ok() {
-            let _ = std::fs::rename(&tmp, path);
-        }
+    if let Ok(bytes) = serde_json::to_vec(cache)
+        && std::fs::write(&tmp, bytes).is_ok()
+    {
+        let _ = std::fs::rename(&tmp, path);
     }
 }
 
@@ -275,12 +275,13 @@ fn read_nfo_description(folder: &Path) -> Option<String> {
             .extension()
             .and_then(|e| e.to_str())
             .is_some_and(|e| e.eq_ignore_ascii_case("nfo"));
-        if is_nfo && path.is_file() {
-            if let Ok(content) = std::fs::read_to_string(&path) {
-                let trimmed = content.trim();
-                if !trimmed.is_empty() {
-                    return Some(trimmed.to_string());
-                }
+        if is_nfo
+            && path.is_file()
+            && let Ok(content) = std::fs::read_to_string(&path)
+        {
+            let trimmed = content.trim();
+            if !trimmed.is_empty() {
+                return Some(trimmed.to_string());
             }
         }
     }

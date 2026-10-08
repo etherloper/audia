@@ -14,6 +14,7 @@
   import { libraryState } from "./lib/state/library.svelte";
   import { playerState } from "./lib/state/player.svelte";
   import AppShell from "./lib/components/layout/AppShell.svelte";
+  import { updaterState } from "./lib/state/updater.svelte";
   import Tooltips from "./lib/components/shared/Tooltips.svelte";
 
   const inTauri = "__TAURI_INTERNALS__" in window;
@@ -56,6 +57,11 @@
     libraryState.init().then(() => {
       libraryState.initWatchFolder();
     });
+
+    // Look for a new release once things have settled (not in development builds)
+    const updateCheck = !import.meta.env.DEV && updaterState.autoCheck
+      ? setTimeout(() => updaterState.checkForUpdates({ silent: true }), 8000)
+      : null;
 
     // Flush the current position before the window goes away (close button, Alt+F4, etc.)
     let unlistenClose: (() => void) | null = null;
@@ -218,6 +224,7 @@
     window.addEventListener("contextmenu", handleContextMenu);
     return () => {
       unlistenClose?.();
+      if (updateCheck) clearTimeout(updateCheck);
       untrackWindow?.();
       unlistenTray?.();
       unlistenMedia?.();

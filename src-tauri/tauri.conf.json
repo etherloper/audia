@@ -58,6 +58,15 @@
       }
     }
   },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDkyRUY0RDg3OUU5NUYxRDEKUldUUjhaV2VoMDN2a3M2Ty9ZblV3R0MweWt3aUI5YjNEanA2WnI4cnFvWlJTSHZ6U1NaK0tiQ1MK",
+      "endpoints": ["https://github.com/etherloper/audia/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

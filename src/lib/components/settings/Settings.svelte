@@ -7,6 +7,7 @@
   import { open } from "@tauri-apps/plugin-dialog";
   import ConfirmDialog from "../shared/ConfirmDialog.svelte";
   import SpeedSlider from "../shared/SpeedSlider.svelte";
+  import { updaterState } from "../../state/updater.svelte";
   import { openWelcome } from "../shared/Welcome.svelte";
   import {
     settingsState,
@@ -516,7 +517,72 @@
       <div class="rounded-lg border border-warm-200 bg-warm-50 dark:border-neutral-800 dark:bg-neutral-900">
         <div class="px-4 py-3">
           <p class="text-[13px] font-medium">Audia</p>
-          <p class="text-[11px] text-warm-500 dark:text-neutral-500">Offline audiobook player &middot; v0.1.0</p>
+          <p class="text-[11px] text-warm-500 dark:text-neutral-500">
+            Offline audiobook player{#if updaterState.currentVersion} &middot; v{updaterState.currentVersion}{/if}
+          </p>
+        </div>
+        <div class="flex items-center justify-between gap-4 border-t border-warm-200 px-4 py-3 dark:border-neutral-800">
+          <div class="min-w-0">
+            <p class="text-[13px] font-medium">Updates</p>
+            {#if updaterState.status === "checking"}
+              <p class="text-[11px] text-warm-500 dark:text-neutral-500">Checking…</p>
+            {:else if updaterState.status === "up-to-date"}
+              <p class="text-[11px] text-warm-500 dark:text-neutral-500">You're on the latest version.</p>
+            {:else if updaterState.status === "available" && updaterState.available}
+              <p class="text-[11px] font-medium text-accent-600 dark:text-accent-400">Version {updaterState.available.version} is available.</p>
+            {:else if updaterState.status === "downloading"}
+              {@const p = updaterState.progress}
+              <div class="mt-1.5 flex items-center gap-2">
+                <div class="h-1 w-40 overflow-hidden rounded-full bg-warm-200 dark:bg-white/[0.08]">
+                  <div class="h-full rounded-full bg-accent-500 transition-[width] duration-300" style="width: {p.total ? Math.min(100, (p.downloaded / p.total) * 100) : 0}%"></div>
+                </div>
+                <span class="text-[11px] tabular-nums text-warm-500 dark:text-neutral-500">
+                  {p.total ? `${Math.round((p.downloaded / p.total) * 100)}%` : "Downloading…"}
+                </span>
+              </div>
+            {:else if updaterState.status === "installing"}
+              <p class="text-[11px] text-warm-500 dark:text-neutral-500">Installing. Audia will restart.</p>
+            {:else if updaterState.status === "error"}
+              <p class="text-[11px] text-red-500">Couldn't check for updates. Try again later.</p>
+            {:else}
+              <p class="text-[11px] text-warm-500 dark:text-neutral-500">New versions are published on GitHub.</p>
+            {/if}
+          </div>
+          {#if updaterState.status === "available"}
+            <button
+              onclick={() => updaterState.installUpdate()}
+              class="btn-primary flex h-8 shrink-0 items-center whitespace-nowrap rounded-md px-3 text-[13px] font-medium"
+            >
+              Update and restart
+            </button>
+          {:else}
+            <button
+              onclick={() => updaterState.checkForUpdates()}
+              disabled={updaterState.status === "checking" || updaterState.status === "downloading" || updaterState.status === "installing"}
+              class="btn-secondary flex h-8 shrink-0 items-center whitespace-nowrap rounded-md border px-3 text-[13px] font-medium disabled:opacity-50"
+            >
+              Check for updates
+            </button>
+          {/if}
+        </div>
+        <div class="flex items-center justify-between gap-4 border-t border-warm-200 px-4 py-3 dark:border-neutral-800">
+          <div class="min-w-0">
+            <p class="text-[13px] font-medium" id="auto-update-label">Check automatically</p>
+            <p class="text-[11px] text-warm-500 dark:text-neutral-500">Look for a new version shortly after Audia starts</p>
+          </div>
+          <button
+            role="switch"
+            aria-checked={updaterState.autoCheck}
+            aria-labelledby="auto-update-label"
+            onclick={() => (updaterState.autoCheck = !updaterState.autoCheck)}
+            class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200
+              {updaterState.autoCheck ? 'bg-accent-500' : 'bg-warm-300 dark:bg-neutral-700'}"
+          >
+            <span
+              class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200
+                {updaterState.autoCheck ? 'translate-x-4' : ''}"
+            ></span>
+          </button>
         </div>
         <div class="flex items-center justify-between gap-4 border-t border-warm-200 px-4 py-3 dark:border-neutral-800">
           <div class="min-w-0">
