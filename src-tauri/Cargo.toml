@@ -1,6 +1,6 @@
 [package]
 name = "audia"
-version = "0.1.0"
+version = "0.1.1"
 description = "An offline audiobook player for your own library"
 authors = ["etherloper"]
 license = "MIT"
