@@ -108,11 +108,11 @@
       <!-- Shares the bottom-left corner with the play button, so it fades out while that's showing -->
       <div class="absolute bottom-2 left-2 flex items-center rounded-full bg-black/60 px-2 py-1 ring-1 ring-white/10 backdrop-blur-md transition-opacity duration-200 group-hover:opacity-0">
         <div class="waveform-bars h-2.5">
-          <span class="bg-accent-400"></span>
-          <span class="bg-accent-400"></span>
-          <span class="bg-accent-400"></span>
-          <span class="bg-accent-400"></span>
-          <span class="bg-accent-400"></span>
+          <span class="bg-white"></span>
+          <span class="bg-white"></span>
+          <span class="bg-white"></span>
+          <span class="bg-white"></span>
+          <span class="bg-white"></span>
         </div>
       </div>
     {/if}

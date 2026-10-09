@@ -2,7 +2,7 @@
 
 An offline audiobook player for your own library. Point it at the folder where you keep your audiobooks and Audia organises them, remembers your place in every book, and stays out of the way while you listen.
 
-<!-- Add a screenshot here, e.g. ![Audia library](docs/screenshot-library.png) -->
+![Audia's library in dark mode](docs/screenshots/library-dark.png)
 
 ## Download
 
@@ -35,6 +35,22 @@ The installer isn't code-signed yet, so Windows SmartScreen may warn you the fir
 - Listening history and stats.
 - Light and dark themes with a choice of accent colours.
 - Backup and restore of your progress, bookmarks and edits.
+
+## Screenshots
+
+**A book's page**, with its chapters, progress, genres and tags
+
+![A book's page in dark mode](docs/screenshots/book-dark.png)
+
+**Home**, in the light theme
+
+![Home in light mode, with Continue Listening and Recently Added](docs/screenshots/home-light.png)
+
+**The library as a list**, sortable by any column
+
+![The library's list view in light mode](docs/screenshots/library-list-light.png)
+
+*Screenshots use a sample library of public-domain classics with placeholder covers.*
 
 ## Supported formats
 
