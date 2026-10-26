@@ -1,10 +1,14 @@
-# Builds the Windows installers and the signed update files, and puts them in a
-# draft GitHub release. Runs when a version tag such as v0.2.0 is pushed; the tag
-# must match "version" in src-tauri/tauri.conf.json. Review the draft, then
-# publish it: the app only sees published releases as updates.
+# Builds Audia for Windows, macOS (Apple Silicon and Intel) and Linux, with the
+# signed update files, and puts them all in one draft GitHub release.
+#
+# - Pushing a version tag such as v0.2.0 makes a release. The tag must match
+#   "version" in src-tauri/tauri.conf.json. Review the draft, then publish it:
+#   the app only sees published releases as updates.
+# - Running the workflow by hand (Actions → Release → Run workflow) is a dry run:
+#   it builds every platform without creating a release.
 #
 # Needs two repository secrets (Settings → Secrets and variables → Actions):
-#   TAURI_SIGNING_PRIVATE_KEY           the private key from `bunx tauri signer generate`
+#   TAURI_SIGNING_PRIVATE_KEY           the private key from `bun tauri signer generate`
 #   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  its password
 
 name: Release
@@ -12,18 +16,23 @@ name: Release
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  release:
-    runs-on: windows-latest
+  # Checks the code once, then creates the draft release that every platform's
+  # build uploads into. (Letting each build create it can make several drafts.)
+  create-release:
+    runs-on: ubuntu-22.04
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
     steps:
       - uses: actions/checkout@v5
 
       - name: Check the tag matches the app version
-        shell: bash
+        if: github.event_name == 'push'
         run: |
           version=$(node -p "require('./src-tauri/tauri.conf.json').version")
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
@@ -33,12 +42,6 @@ jobs:
 
       - uses: oven-sh/setup-bun@v2
 
-      - uses: dtolnay/rust-toolchain@stable
-
-      - uses: swatinem/rust-cache@v2
-        with:
-          workspaces: src-tauri
-
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
@@ -46,10 +49,67 @@ jobs:
         run: |
           bun run check
           bun run test
-          cd src-tauri
-          cargo test
 
-      - name: Build and create the draft release
+      - name: Create the draft release
+        id: release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --draft --verify-tag \
+            --title "Audia $GITHUB_REF_NAME" \
+            --notes-file .github/release-notes.md
+          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq ".[] | select(.tag_name == \"$GITHUB_REF_NAME\") | .id" | head -n 1)
+          echo "id=$id" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: create-release
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows
+            platform: windows-latest
+            target: x86_64-pc-windows-msvc
+          - name: Linux
+            platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+          - name: macOS (Apple Silicon)
+            platform: macos-latest
+            target: aarch64-apple-darwin
+          - name: macOS (Intel)
+            platform: macos-latest
+            target: x86_64-apple-darwin
+    name: Build (${{ matrix.name }})
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Linux build dependencies
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev patchelf
+
+      - uses: oven-sh/setup-bun@v2
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          key: ${{ matrix.target }}
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Rust tests
+        working-directory: src-tauri
+        run: cargo test
+
+      - name: Build and upload to the draft release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,14 +117,10 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tauriScript: bun tauri
-          args: --config src-tauri/tauri.release.conf.json
-          tagName: ${{ github.ref_name }}
-          releaseName: Audia ${{ github.ref_name }}
-          releaseBody: |
-            Download **Audia_*_x64-setup.exe** below and run it. If Audia is already installed it updates in place, and your library and settings are kept.
-
-            Windows may show a SmartScreen warning because the installer isn't code-signed yet: choose **More info → Run anyway**.
-          releaseDraft: true
-          prerelease: false
+          args: --config src-tauri/tauri.release.conf.json --target ${{ matrix.target }}
+          # Empty on a dry run, so the action only builds
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          tagName: ${{ github.event_name == 'push' && github.ref_name || '' }}
           includeUpdaterJson: true
           updaterJsonPreferNsis: true
+          retryAttempts: 2
