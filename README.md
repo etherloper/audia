@@ -6,9 +6,26 @@ An offline audiobook player for your own library. Point it at the folder where y
 
 ## Download
 
-Get the latest Windows installer (`Audia_…_x64-setup.exe`) from the [Releases page](https://github.com/etherloper/audia/releases/latest). Once installed, Audia checks for new versions itself and offers to update; you can turn that off or check by hand in **Settings → About**.
+Download the file for your system from the **[latest release](https://github.com/etherloper/audia/releases/latest)**:
 
-The installer isn't code-signed yet, so Windows SmartScreen may warn you the first time. Choose **More info → Run anyway**.
+| System | File to download | Notes |
+|---|---|---|
+| **Windows** 10 / 11 | `Audia_…_x64-setup.exe` | Installer. Updates itself. |
+| **macOS**, Apple Silicon (M1 and later) | `Audia_…_aarch64.dmg` | Drag Audia to Applications. Updates itself. |
+| **macOS**, Intel | `Audia_…_x64.dmg` | Drag Audia to Applications. Updates itself. |
+| **Linux**, any distribution | `Audia_…_amd64.AppImage` | Make it executable, then run it. Updates itself. |
+| **Linux**, Debian / Ubuntu | `Audia_…_amd64.deb` | Install with your package manager. |
+| **Linux**, Fedora / openSUSE | `Audia-…-1.x86_64.rpm` | Install with your package manager. |
+
+Where it says "Updates itself", Audia checks for new versions and offers to update; you can turn that off or check by hand in **Settings → About**.
+
+**First launch:** the app isn't code-signed yet.
+
+- **Windows:** SmartScreen may warn you. Choose **More info → Run anyway**.
+- **macOS:** right-click Audia in Applications and choose **Open**, then **Open** again. If macOS says the app "is damaged", run `xattr -cr /Applications/Audia.app` in Terminal and try again.
+- **Linux AppImage:** run `chmod +x Audia_*.AppImage` first, or tick "Allow executing file as program" in its properties.
+
+Audia is developed and tested mainly on Windows; the macOS and Linux builds are newer, so please report anything that doesn't work.
 
 ## Features
 
@@ -16,7 +33,7 @@ The installer isn't code-signed yet, so Windows SmartScreen may warn you the fir
 - Watches your audiobook folder and picks up new books automatically. Drag books onto the window to copy them in.
 - Grid or list view, with filters (in progress, not started, finished, favourites), sorting, and grouping by author, series or genre.
 - Genres read from your files, plus your own tags.
-- Quick search (Ctrl+K) across books, authors, series, genres, tags and bookmark notes.
+- Quick search (Ctrl+K, or ⌘K on macOS) across books, authors, series, genres, tags and bookmark notes.
 - Covers and chapters read from the files themselves, including the chapter markers inside .m4b and other single-file books.
 - Edit any book's details. "Find online" offers covers and descriptions from Open Library and Google Books to choose from.
 
@@ -30,7 +47,7 @@ The installer isn't code-signed yet, so Windows SmartScreen may warn you the fir
 
 **Around the desktop**
 - Mini player that snaps to a corner of the screen and can stay on top.
-- Media keys and the Windows media overlay.
+- Media keys and the system media controls (the Windows media overlay, macOS Now Playing, MPRIS on Linux).
 - Closes to the system tray if you want it to.
 - Listening history and stats.
 - Light and dark themes with a choice of accent colours.
@@ -78,7 +95,7 @@ Audia works entirely offline. The only time it goes online is when you click **F
 
 ## Building from source
 
-Audia is built with [Tauri 2](https://tauri.app), [Svelte 5](https://svelte.dev) and Rust. It's developed and tested on Windows.
+Audia is built with [Tauri 2](https://tauri.app), [Svelte 5](https://svelte.dev) and Rust, and runs on Windows, macOS and Linux.
 
 ### Prerequisites
 
@@ -117,7 +134,13 @@ Updates are signed. The workflow needs two repository secrets, `TAURI_SIGNING_PR
 
 ## Where your data lives
 
-Your library database, cover images, settings and logs are stored in your user profile under `com.audia.app` (on Windows, `%APPDATA%\com.audia.app` and `%LOCALAPPDATA%\com.audia.app`). Your audio files are never modified. Uninstalling Audia leaves your data in place unless you choose to remove it.
+Your library database, cover images, settings and logs are stored in your user profile under `com.audia.app`:
+
+- **Windows:** `%APPDATA%\com.audia.app` and `%LOCALAPPDATA%\com.audia.app`
+- **macOS:** `~/Library/Application Support/com.audia.app` and `~/Library/Logs/com.audia.app`
+- **Linux:** `~/.local/share/com.audia.app` and `~/.config/com.audia.app`
+
+Your audio files are never modified. Uninstalling Audia leaves your data in place unless you choose to remove it.
 
 ## License
 
