@@ -6,16 +6,16 @@ An offline audiobook player for your own library. Point it at the folder where y
 
 ## Download
 
-Download the file for your system from the **[latest release](https://github.com/etherloper/audia/releases/latest)**:
+Each link opens the **latest release**; download the file named for your system:
 
-| System | File to download | Notes |
+| System | Download | Notes |
 |---|---|---|
-| **Windows** 10 / 11 | `Audia_…_x64-setup.exe` | Installer. Updates itself. |
-| **macOS**, Apple Silicon (M1 and later) | `Audia_…_aarch64.dmg` | Drag Audia to Applications. Updates itself. |
-| **macOS**, Intel | `Audia_…_x64.dmg` | Drag Audia to Applications. Updates itself. |
-| **Linux**, any distribution | `Audia_…_amd64.AppImage` | Make it executable, then run it. Updates itself. |
-| **Linux**, Debian / Ubuntu | `Audia_…_amd64.deb` | Install with your package manager. |
-| **Linux**, Fedora / openSUSE | `Audia-…-1.x86_64.rpm` | Install with your package manager. |
+| **Windows** 10 / 11 | [`Audia_…_x64-setup.exe`](https://github.com/etherloper/audia/releases/latest) | Installer. Updates itself. |
+| **macOS**, Apple Silicon (M1 and later) | [`Audia_…_aarch64.dmg`](https://github.com/etherloper/audia/releases/latest) | Drag Audia to Applications. Updates itself. |
+| **macOS**, Intel | [`Audia_…_x64.dmg`](https://github.com/etherloper/audia/releases/latest) | Drag Audia to Applications. Updates itself. |
+| **Linux**, any distribution | [`Audia_…_amd64.AppImage`](https://github.com/etherloper/audia/releases/latest) | Make it executable, then run it. Updates itself. |
+| **Linux**, Debian / Ubuntu | [`Audia_…_amd64.deb`](https://github.com/etherloper/audia/releases/latest) | Install with your package manager. |
+| **Linux**, Fedora / openSUSE | [`Audia-…-1.x86_64.rpm`](https://github.com/etherloper/audia/releases/latest) | Install with your package manager. |
 
 Where it says "Updates itself", Audia checks for new versions and offers to update; you can turn that off or check by hand in **Settings → About**.
 
