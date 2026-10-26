@@ -7,6 +7,8 @@ describe("splitShortcut", () => {
     expect(splitShortcut("Expand (Ctrl+Shift+M)")).toEqual(["Expand", "Ctrl+Shift+M"]);
     expect(splitShortcut("Close (Esc)")).toEqual(["Close", "Esc"]);
     expect(splitShortcut("Add bookmark (B)")).toEqual(["Add bookmark", "B"]);
+    expect(splitShortcut("Search (⌘+K)")).toEqual(["Search", "⌘+K"]);
+    expect(splitShortcut("Expand (⌘+⇧+M)")).toEqual(["Expand", "⌘+⇧+M"]);
   });
 
   it("leaves ordinary brackets alone", () => {

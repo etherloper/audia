@@ -15,6 +15,7 @@
   import { playerState } from "./lib/state/player.svelte";
   import AppShell from "./lib/components/layout/AppShell.svelte";
   import { updaterState } from "./lib/state/updater.svelte";
+  import { hasModKey } from "./lib/utils/platform";
   import Tooltips from "./lib/components/shared/Tooltips.svelte";
 
   const inTauri = "__TAURI_INTERNALS__" in window;
@@ -141,7 +142,7 @@
     }
 
     function handleKeydown(e: KeyboardEvent) {
-      if (e.ctrlKey && e.shiftKey && e.code === "KeyM") {
+      if (hasModKey(e) && e.shiftKey && e.code === "KeyM") {
         e.preventDefault();
         if (playerState.currentBookId !== null || miniPlayerState.active) miniPlayerState.toggle();
         return;

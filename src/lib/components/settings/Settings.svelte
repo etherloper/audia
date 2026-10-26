@@ -7,6 +7,8 @@
   import { open } from "@tauri-apps/plugin-dialog";
   import ConfirmDialog from "../shared/ConfirmDialog.svelte";
   import SpeedSlider from "../shared/SpeedSlider.svelte";
+  import Switch from "../shared/Switch.svelte";
+  import { modKey, shiftKey } from "../../utils/platform";
   import { updaterState } from "../../state/updater.svelte";
   import { openWelcome } from "../shared/Welcome.svelte";
   import {
@@ -88,13 +90,13 @@
   const shortcuts = [
     { keys: ["Space"], action: "Play / pause" },
     { keys: ["←", "→"], action: "Skip back / forward" },
-    { keys: ["Shift", "←", "→"], action: "Previous / next chapter" },
+    { keys: [shiftKey, "←", "→"], action: "Previous / next chapter" },
     { keys: ["[", "]"], action: "Slower / faster" },
     { keys: ["↑", "↓"], action: "Volume" },
     { keys: ["M"], action: "Mute" },
     { keys: ["B"], action: "Add bookmark" },
-    { keys: ["Ctrl", "Shift", "M"], action: "Mini player" },
-    { keys: ["Ctrl", "K"], action: "Quick search" },
+    { keys: [modKey, shiftKey, "M"], action: "Mini player" },
+    { keys: [modKey, "K"], action: "Quick search" },
   ];
 
   let clearing = $state(false);
@@ -304,19 +306,7 @@
             <p class="text-[13px] font-medium" id="voice-boost-label">Voice boost</p>
             <p class="text-[11px] text-warm-500 dark:text-neutral-500">Evens out the volume so quiet narration is easier to hear</p>
           </div>
-          <button
-            role="switch"
-            aria-checked={settingsState.voiceBoost}
-            aria-labelledby="voice-boost-label"
-            onclick={() => playerState.setVoiceBoost(!settingsState.voiceBoost)}
-            class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200
-              {settingsState.voiceBoost ? 'bg-accent-500' : 'bg-warm-300 dark:bg-neutral-700'}"
-          >
-            <span
-              class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200
-                {settingsState.voiceBoost ? 'translate-x-4' : ''}"
-            ></span>
-          </button>
+          <Switch checked={settingsState.voiceBoost} labelledby="voice-boost-label" onchange={(v) => playerState.setVoiceBoost(v)} />
         </div>
         <div class="border-t border-warm-200 dark:border-neutral-800"></div>
         {@render optionRow("Rewind on resume", "Step back a little after a pause, so you don't lose your place", REWIND_ON_RESUME_OPTIONS, settingsState.rewindOnResumeSecs, (v) => (settingsState.rewindOnResumeSecs = v), (v) => (v === 0 ? "Off" : `${v}s`))}
@@ -336,19 +326,7 @@
                 : "Closing the window quits Audia."}
             </p>
           </div>
-          <button
-            role="switch"
-            aria-checked={settingsState.closeToTray}
-            aria-labelledby="close-to-tray-label"
-            onclick={() => (settingsState.closeToTray = !settingsState.closeToTray)}
-            class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200
-              {settingsState.closeToTray ? 'bg-accent-500' : 'bg-warm-300 dark:bg-neutral-700'}"
-          >
-            <span
-              class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200
-                {settingsState.closeToTray ? 'translate-x-4' : ''}"
-            ></span>
-          </button>
+          <Switch checked={settingsState.closeToTray} labelledby="close-to-tray-label" onchange={(v) => (settingsState.closeToTray = v)} />
         </div>
       </div>
     </section>
@@ -570,19 +548,7 @@
             <p class="text-[13px] font-medium" id="auto-update-label">Check automatically</p>
             <p class="text-[11px] text-warm-500 dark:text-neutral-500">Look for a new version shortly after Audia starts</p>
           </div>
-          <button
-            role="switch"
-            aria-checked={updaterState.autoCheck}
-            aria-labelledby="auto-update-label"
-            onclick={() => (updaterState.autoCheck = !updaterState.autoCheck)}
-            class="relative h-5 w-9 shrink-0 rounded-full transition-colors duration-200
-              {updaterState.autoCheck ? 'bg-accent-500' : 'bg-warm-300 dark:bg-neutral-700'}"
-          >
-            <span
-              class="absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform duration-200
-                {updaterState.autoCheck ? 'translate-x-4' : ''}"
-            ></span>
-          </button>
+          <Switch checked={updaterState.autoCheck} labelledby="auto-update-label" onchange={(v) => (updaterState.autoCheck = v)} />
         </div>
         <div class="flex items-center justify-between gap-4 border-t border-warm-200 px-4 py-3 dark:border-neutral-800">
           <div class="min-w-0">

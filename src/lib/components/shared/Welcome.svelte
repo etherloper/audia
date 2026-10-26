@@ -22,6 +22,7 @@
   import { libraryState } from "../../state/library.svelte";
   import { uiState } from "../../state/ui.svelte";
   import { ACCENTS } from "../../utils/accents";
+  import { modKey, shiftKey } from "../../utils/platform";
 
   /**
    * First-run setup: shown once on a fresh install (no books, no folder) to pick
@@ -79,9 +80,9 @@
   ] as const;
 
   const tips = [
-    { keys: "Ctrl K", text: "Search books, authors, genres and notes" },
+    { keys: `${modKey} K`, text: "Search books, authors, genres and notes" },
     { keys: "Space", text: "Play or pause, from anywhere in the app" },
-    { keys: "Ctrl Shift M", text: "Shrink to the mini player" },
+    { keys: `${modKey} ${shiftKey} M`, text: "Shrink to the mini player" },
     { keys: "Drag", text: "Drop books onto the window to add them to your library" },
   ];
 </script>

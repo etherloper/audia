@@ -1,4 +1,4 @@
-const SHORTCUT = /\s*\(((?:Ctrl|Shift|Alt|Esc|Space|Enter|[A-Z0-9])(?:[+ ][^()]*)?)\)\s*$/;
+const SHORTCUT = /\s*\(((?:Ctrl|Shift|Alt|Esc|Space|Enter|⌘|⇧|[A-Z0-9])(?:[+ ][^()]*)?)\)\s*$/;
 
 /**
  * Split a trailing keyboard shortcut off a tooltip so it can be shown as a key:

@@ -10,6 +10,7 @@
   import SleepTimer from "./SleepTimer.svelte";
   import ChapterMenu from "./ChapterMenu.svelte";
   import SpeedSlider from "../shared/SpeedSlider.svelte";
+  import { modKey, shiftKey } from "../../utils/platform";
   import { miniPlayerState } from "../../state/miniPlayer.svelte";
 
   let book = $derived(
@@ -138,7 +139,7 @@
         <button
           onclick={() => miniPlayerState.enter()}
           class="flex h-8 w-8 items-center justify-center rounded-lg text-warm-400 transition-all duration-200 hover:bg-warm-200/40 hover:text-warm-800 active:scale-90 dark:text-neutral-500 dark:hover:bg-white/[0.06] dark:hover:text-white"
-          title="Mini player (Ctrl+Shift+M)"
+          title="Mini player ({modKey}+{shiftKey}+M)"
           aria-label="Switch to mini player"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

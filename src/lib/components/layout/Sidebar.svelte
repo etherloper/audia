@@ -2,6 +2,7 @@
   import { uiState } from "../../state/ui.svelte";
   import { libraryState } from "../../state/library.svelte";
   import { openQuickSearch } from "../shared/QuickSearch.svelte";
+  import { modKey } from "../../utils/platform";
 
   let collapsed = $derived(uiState.sidebarCollapsed);
 </script>
@@ -34,14 +35,14 @@
 
   <!-- Navigation -->
   <nav class="flex-1 space-y-0.5 px-2 pt-3">
-    <!-- Quick search (opens the Ctrl+K palette) -->
+    <!-- Quick search (opens the ⌘K / Ctrl+K palette) -->
     <button
       onclick={openQuickSearch}
       class="mb-2 flex w-full items-center gap-2.5 rounded-lg text-[13px] transition-all duration-200 active:scale-[0.97]
         {collapsed
           ? 'justify-center px-2.5 py-2 text-warm-500 hover:bg-warm-800/5 hover:text-warm-800 dark:text-neutral-400 dark:hover:bg-white/5 dark:hover:text-white'
           : 'border border-warm-200/80 px-2.5 py-1.5 text-warm-400 hover:border-warm-300 hover:text-warm-700 dark:border-white/[0.08] dark:text-neutral-500 dark:hover:border-white/15 dark:hover:text-neutral-300'}"
-      title="Search (Ctrl+K)"
+      title="Search ({modKey}+K)"
       aria-label="Search"
     >
       <svg class="shrink-0 {collapsed ? 'h-[18px] w-[18px]' : 'h-4 w-4'}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -49,7 +50,11 @@
       </svg>
       {#if !collapsed}
         <span class="flex-1 text-left">Search</span>
-        <kbd class="rounded border border-warm-200 px-1 text-[10px] dark:border-neutral-700">Ctrl K</kbd>
+        <span class="flex items-center gap-0.5" aria-hidden="true">
+          {#each [modKey, "K"] as key}
+            <kbd class="flex h-[18px] min-w-[18px] items-center justify-center rounded border border-warm-200 bg-warm-50 px-1 font-sans {key === "⌘" ? "text-[12.5px]" : "text-[10.5px]"} font-medium leading-none text-warm-500 dark:border-white/[0.1] dark:bg-white/[0.04] dark:text-neutral-400">{key}</kbd>
+          {/each}
+        </span>
       {/if}
     </button>
     <button

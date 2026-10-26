@@ -7,6 +7,7 @@
   import { coverSrc } from "../../utils/covers";
   import { formatDuration } from "../../utils/format";
   import { tick } from "svelte";
+  import { modKey, shiftKey } from "../../utils/platform";
 
   // The chapter list is sized to its rows, so a short list doesn't scroll; long
   // ones stop at a maximum that leaves part of a row showing as a scroll hint.
@@ -340,7 +341,7 @@
         <button
           onclick={expand}
           class="flex h-7 w-7 items-center justify-center rounded-md text-warm-400 transition-colors hover:text-warm-800 dark:text-neutral-500 dark:hover:text-white"
-          title="Expand (Ctrl+Shift+M)"
+          title="Expand ({modKey}+{shiftKey}+M)"
           aria-label="Expand to full window"
         >
           <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
