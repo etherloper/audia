@@ -55,11 +55,20 @@ jobs:
         if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # The API returns the new release's id directly; listing releases straight
+        # after creating one can miss it
         run: |
-          gh release create "$GITHUB_REF_NAME" --draft --verify-tag \
-            --title "Audia $GITHUB_REF_NAME" \
-            --notes-file .github/release-notes.md
-          id=$(gh api "repos/$GITHUB_REPOSITORY/releases" --jq ".[] | select(.tag_name == \"$GITHUB_REF_NAME\") | .id" | head -n 1)
+          id=$(gh api -X POST "repos/$GITHUB_REPOSITORY/releases" \
+            -f tag_name="$GITHUB_REF_NAME" \
+            -f name="Audia $GITHUB_REF_NAME" \
+            -F body=@.github/release-notes.md \
+            -F draft=true \
+            --jq .id)
+          if [ -z "$id" ]; then
+            echo "::error::Couldn't create the draft release"
+            exit 1
+          fi
+          echo "Created draft release $id"
           echo "id=$id" >> "$GITHUB_OUTPUT"
 
   build:
@@ -83,6 +92,12 @@ jobs:
     name: Build (${{ matrix.name }})
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: Check the draft release was created
+        if: github.event_name == 'push' && needs.create-release.outputs.release_id == ''
+        run: |
+          echo "::error::No draft release id from the create-release job"
+          exit 1
+
       - uses: actions/checkout@v5
 
       - name: Install Linux build dependencies
